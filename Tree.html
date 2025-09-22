@@ -18,12 +18,15 @@
       font-size: 16px;
       margin-right: 5px;
     }
+    video { display: none; }
   </style>
 </head>
 
 <body>
+  <!-- Hidden video element for custom AR.js source -->
+  <video id="arVideo" autoplay playsinline muted></video>
+
   <a-scene embedded vr-mode-ui="enabled: false" arjs="trackingMethod: best; sourceType: webcam;">
-    
     <!-- Hiro marker -->
     <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.hiro">
       <a-entity gltf-model="models/medical_syringe.glb" scale="10 10 10" position="0 0 0"></a-entity>
@@ -38,37 +41,48 @@
   </div>
 
   <script>
-    let currentFacing = "user"; // front camera
-    const scene = document.querySelector("a-scene");
+    const videoEl = document.getElementById("arVideo");
+    const sceneEl = document.querySelector("a-scene");
+    let currentFacing = "user"; // front camera by default
 
-    // Initialize AR.js with custom getUserMedia
-    function initAR(facingMode) {
-      const arSource = scene.components.arjs.arSource;
-
-      navigator.mediaDevices.getUserMedia({ video: { facingMode } })
-        .then(stream => {
-          arSource.domElement.srcObject = stream;
-          arSource.domElement.play();
-        })
-        .catch(err => {
-          console.error("Camera access failed:", err);
-          alert("Camera access denied or not available.");
+    // Function to start camera stream and set AR.js source
+    async function startCamera(facingMode) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode }, audio: false 
         });
+        videoEl.srcObject = stream;
+        await videoEl.play();
+
+        // Initialize AR.js with custom video element
+        const arSource = sceneEl.components.arjs.arSource;
+        arSource.domElement = videoEl;
+        arSource.ready = true;
+        arSource.init();
+        arSource.onResizeElement();
+        arSource.copyElementSizeTo(sceneEl);
+        sceneEl.components.arjs.arSource = arSource;
+
+      } catch (err) {
+        console.error("Camera access failed:", err);
+        alert("Camera access denied or not available.");
+      }
     }
 
-    // Wait until AR.js is loaded
-    scene.addEventListener("loaded", () => {
-      initAR(currentFacing);
-    });
+    // Start camera on page load
+    sceneEl.addEventListener("loaded", () => startCamera(currentFacing));
 
-    // Switch camera in real time
+    // Switch camera button
     document.getElementById("toggleCamera").addEventListener("click", () => {
       currentFacing = (currentFacing === "user") ? "environment" : "user";
-      initAR(currentFacing);
+      startCamera(currentFacing);
     });
 
     // Take selfie button
-    document.getElementById("takeSelfie").addEventListener("click", () => {
+    document.getElementById("takeSelfie").addEventListener("click", async () => {
+      // Wait a tiny moment to ensure canvas has video
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       const canvas = document.querySelector("canvas");
       if (!canvas) {
         alert("Camera not ready yet!");
@@ -77,17 +91,18 @@
 
       const image = canvas.toDataURL("image/png");
 
-      // Download selfie
+      // Download selfie automatically
       const link = document.createElement("a");
       link.download = "selfie.png";
       link.href = image;
       link.click();
 
-      // Open Padlet
+      // Open Padlet wall
       const padletUrl = "https://padlet.com/roxloon777/campus-hunt-wall-of-fame-gkek97r08b9p9047";
       window.open(padletUrl, "_blank");
     });
   </script>
 </body>
 </html>
+
 

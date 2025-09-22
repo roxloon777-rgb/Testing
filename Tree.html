@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Campus AR Hunt</title>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <style>
+      body { margin:0; overflow:hidden; }
+      #checkin { display:none; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 10px 20px; font-size: 18px; background: #0078d7; color: white; border-radius: 8px; border: none; cursor: pointer; z-index: 10; }
+      #hint { position: absolute; top: 12px; left: 12px; color: white; z-index: 10; font-weight:600; }
+    </style>
+  </head>
+  <body>
+
+    <div id="hint">Point camera at a campus marker</div>
+    <button id="checkin">Check-in</button>
+
+    <a-scene embedded arjs='sourceType: webcam;'>
+
+      <a-marker type="pattern" url="markers/library.patt" id="marker-library"
+                data-marker-name="Library"
+                data-checkin-url="https://forms.gle/placeholderLibrary">
+        <a-box position="0 0.4 0" rotation="0 45 0" scale="0.5 0.5 0.5"></a-box>
+        <a-text value="Library" position="0 1 0" align="center"></a-text>
+      </a-marker>
+
+      <a-marker type="pattern" url="markers/sports.patt" id="marker-sports"
+                data-marker-name="SportsField"
+                data-checkin-url="https://forms.gle/placeholderSports">
+        <a-sphere position="0 0.4 0"></a-sphere>
+        <a-text value="Sports Field" position="0 1 0" align="center"></a-text>
+      </a-marker>
+
+      <a-marker type="pattern" url="markers/admin.patt" id="marker-admin"
+                data-marker-name="AdminBuilding"
+                data-checkin-url="https://forms.gle/placeholderAdmin">
+        <a-cone position="0 0.4 0"></a-cone>
+        <a-text value="Admin" position="0 1 0" align="center"></a-text>
+      </a-marker>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+      const checkinBtn = document.getElementById('checkin');
+      let currentCheckinUrl = null;
+
+      document.querySelectorAll('a-marker').forEach(marker => {
+        marker.addEventListener('markerFound', () => {
+          const name = marker.getAttribute('data-marker-name') || 'Marker';
+          currentCheckinUrl = marker.getAttribute('data-checkin-url') || null;
+          checkinBtn.style.display = 'block';
+          checkinBtn.textContent = 'Check-in: ' + name;
+        });
+        marker.addEventListener('markerLost', () => {
+          checkinBtn.style.display = 'none';
+          currentCheckinUrl = null;
+        });
+      });
+
+      checkinBtn.addEventListener('click', () => {
+        if (currentCheckinUrl) window.open(currentCheckinUrl, '_blank');
+      });
+    </script>
+  </body>
+</html>

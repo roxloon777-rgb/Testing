@@ -18,6 +18,16 @@
       font-size: 16px;
       margin-right: 5px;
     }
+    #preview {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      width: 120px;
+      height: 160px;
+      border: 2px solid #fff;
+      object-fit: cover;
+      z-index: 999;
+    }
   </style>
 </head>
 
@@ -26,7 +36,7 @@
     embedded
     vr-mode-ui="enabled: false"
     id="ar-scene"
-    arjs="sourceType: webcam; facingMode: user;"> <!-- front camera by default -->
+    arjs="sourceType: webcam; facingMode: user;"> <!-- Front camera default -->
 
     <!-- Hiro marker -->
     <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.hiro">
@@ -41,30 +51,35 @@
     <button id="takeSelfie">📸 Take Selfie</button>
   </div>
 
+  <!-- Preview image -->
+  <img id="preview" src="" alt="Selfie preview">
+
   <script>
-    // Keep track of camera mode (front/rear)
+    const sceneEl = document.getElementById("ar-scene");
+    const previewEl = document.getElementById("preview");
     let currentFacing = localStorage.getItem("arFacing") || "user";
 
-    const sceneEl = document.getElementById("ar-scene");
-
-    // Apply facing mode at page load
+    // Apply current facing mode at page load
     sceneEl.setAttribute("arjs", `sourceType: webcam; facingMode: ${currentFacing}`);
 
-    // Switch camera via reload (most reliable on mobile)
+    // Switch Camera button (reload page to reliably switch)
     document.getElementById("toggleCamera").addEventListener("click", () => {
       currentFacing = (currentFacing === "user") ? "environment" : "user";
       localStorage.setItem("arFacing", currentFacing);
       location.reload();
     });
 
-    // Take selfie
+    // Take selfie button
     document.getElementById("takeSelfie").addEventListener("click", () => {
       const canvas = document.querySelector("canvas");
       if (!canvas) return alert("AR scene not ready yet!");
 
-      // Delay slightly to ensure the video has rendered
+      // Delay slightly to ensure at least one frame is rendered
       setTimeout(() => {
         const image = canvas.toDataURL("image/png");
+
+        // Show preview
+        previewEl.src = image;
 
         // Download selfie
         const link = document.createElement("a");

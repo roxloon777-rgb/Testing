@@ -1,92 +1,93 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>AR Selfie Treasure Hunt</title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <style>
-      body { margin: 0; overflow: hidden; }
-      #controls {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        z-index: 999;
+<head>
+  <meta charset="utf-8">
+  <title>AR Selfie Treasure Hunt</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 999;
+    }
+    #controls button {
+      padding: 10px;
+      font-size: 16px;
+      margin-right: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <a-scene embedded vr-mode-ui="enabled: false" arjs="trackingMethod: best; sourceType: webcam;">
+    
+    <!-- Hiro marker -->
+    <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.hiro">
+      <a-entity gltf-model="models/medical_syringe.glb" scale="10 10 10" position="0 0 0"></a-entity>
+    </a-marker>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <div id="controls">
+    <button id="toggleCamera">Switch Camera</button>
+    <button id="takeSelfie">📸 Take Selfie</button>
+  </div>
+
+  <script>
+    let currentFacing = "user"; // front camera
+    const scene = document.querySelector("a-scene");
+
+    // Initialize AR.js with custom getUserMedia
+    function initAR(facingMode) {
+      const arSource = scene.components.arjs.arSource;
+
+      navigator.mediaDevices.getUserMedia({ video: { facingMode } })
+        .then(stream => {
+          arSource.domElement.srcObject = stream;
+          arSource.domElement.play();
+        })
+        .catch(err => {
+          console.error("Camera access failed:", err);
+          alert("Camera access denied or not available.");
+        });
+    }
+
+    // Wait until AR.js is loaded
+    scene.addEventListener("loaded", () => {
+      initAR(currentFacing);
+    });
+
+    // Switch camera in real time
+    document.getElementById("toggleCamera").addEventListener("click", () => {
+      currentFacing = (currentFacing === "user") ? "environment" : "user";
+      initAR(currentFacing);
+    });
+
+    // Take selfie button
+    document.getElementById("takeSelfie").addEventListener("click", () => {
+      const canvas = document.querySelector("canvas");
+      if (!canvas) {
+        alert("Camera not ready yet!");
+        return;
       }
-      #controls button {
-        padding: 10px;
-        font-size: 16px;
-        margin-right: 5px;
-      }
-    </style>
-  </head>
 
-  <body>
-    <a-scene
-      id="ar-scene"
-      embedded
-      arjs="sourceType: webcam; facingMode: user;"> <!-- FRONT camera by default -->
+      const image = canvas.toDataURL("image/png");
 
-      <!-- Hiro marker -->
-      <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.hiro">
-        <a-entity 
-          gltf-model="models/medical_syringe.glb"
-          scale="10 10 10"
-          position="0 0 0">
-        </a-entity>
-      </a-marker>
+      // Download selfie
+      const link = document.createElement("a");
+      link.download = "selfie.png";
+      link.href = image;
+      link.click();
 
-      <a-entity camera></a-entity>
-    </a-scene>
-
-    <!-- Buttons -->
-    <div id="controls">
-      <button id="toggleCamera">Switch Camera</button>
-      <button id="takeSelfie">📸 Take Selfie</button>
-    </div>
-
-    <script>
-      let currentFacing = "user"; // start with front camera
-      const scene = document.getElementById("ar-scene");
-
-      // Switch camera button
-      document.getElementById("toggleCamera").addEventListener("click", () => {
-        currentFacing = (currentFacing === "user") ? "environment" : "user";
-        // Reload page with new camera for reliable switching
-        localStorage.setItem("arFacing", currentFacing);
-        location.reload();
-      });
-
-      // Preserve camera choice across reload
-      window.addEventListener("load", () => {
-        const savedFacing = localStorage.getItem("arFacing");
-        if (savedFacing) {
-          currentFacing = savedFacing;
-          scene.setAttribute("arjs", `sourceType: webcam; facingMode: ${currentFacing}`);
-        }
-      });
-
-      // Take selfie button
-      document.getElementById("takeSelfie").addEventListener("click", () => {
-        const canvas = document.querySelector("canvas");
-        if (!canvas) {
-          alert("Camera not ready yet!");
-          return;
-        }
-
-        // Capture image
-        const image = canvas.toDataURL("image/png");
-
-        // Auto-download selfie
-        const link = document.createElement("a");
-        link.download = "selfie.png";
-        link.href = image;
-        link.click();
-
-        // Open Padlet for upload
-        const padletUrl = "https://padlet.com/roxloon777/campus-hunt-wall-of-fame-gkek97r08b9p9047";
-        window.open(padletUrl, "_blank");
-      });
-    </script>
-  </body>
+      // Open Padlet
+      const padletUrl = "https://padlet.com/roxloon777/campus-hunt-wall-of-fame-gkek97r08b9p9047";
+      window.open(padletUrl, "_blank");
+    });
+  </script>
+</body>
 </html>
+

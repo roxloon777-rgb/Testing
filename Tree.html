@@ -21,20 +21,46 @@
       <a-entity camera></a-entity>
     </a-scene>
 
-    <!-- Camera toggle button -->
-    <button id="toggleCamera" 
-      style="position: absolute; top: 10px; right: 10px; z-index: 999; padding: 10px; font-size: 16px;">
-      Switch Camera
-    </button>
+    <!-- Buttons -->
+    <div style="position:absolute; top:10px; left:10px; z-index:999;">
+      <button id="toggleCamera" style="padding:10px; font-size:16px; margin-right:5px;">
+        Switch Camera
+      </button>
+      <button id="takeSelfie" style="padding:10px; font-size:16px;">
+        📸 Take Selfie
+      </button>
+    </div>
 
     <script>
       let currentFacing = "environment"; // default rear
-      const button = document.getElementById("toggleCamera");
       const scene = document.getElementById("ar-scene");
 
-      button.addEventListener("click", () => {
+      // Toggle camera
+      document.getElementById("toggleCamera").addEventListener("click", () => {
         currentFacing = (currentFacing === "environment") ? "user" : "environment";
         scene.setAttribute("arjs", `sourceType: webcam; facingMode: ${currentFacing}`);
+      });
+
+      // Take selfie
+      document.getElementById("takeSelfie").addEventListener("click", () => {
+        const canvas = document.querySelector("canvas");
+        if (!canvas) {
+          alert("Camera not ready yet!");
+          return;
+        }
+
+        // Capture screenshot
+        const image = canvas.toDataURL("image/png");
+
+        // Open Padlet in new tab
+        const padletUrl = "https://padlet.com/roxloon777/campus-hunt-wall-of-fame-gkek97r08b9p9047";
+        const win = window.open(padletUrl, "_blank");
+
+        // Also auto-download selfie for proof
+        const link = document.createElement("a");
+        link.download = "selfie.png";
+        link.href = image;
+        link.click();
       });
     </script>
   </body>

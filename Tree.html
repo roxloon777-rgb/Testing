@@ -4,63 +4,24 @@
     <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   </head>
   <body style="margin:0; overflow:hidden;">
-    <a-scene 
-      id="ar-scene"
-      embedded 
-      arjs="sourceType: webcam; facingMode: environment;">
-      
-      <!-- Hiro marker -->
-      <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.hiro">
-        <a-entity 
-          gltf-model="models/medical_syringe.glb"
-          scale="10 10 10"
-          position="0 0 0">
-        </a-entity>
-      </a-marker>
+<a-scene 
+  id="ar-scene"
+  embedded 
+  arjs="sourceType: webcam; facingMode: user;"> <!-- change to 'user' for front camera -->
+  
+  <!-- Hiro marker -->
+  <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.hiro">
+    <a-entity 
+      gltf-model="models/medical_syringe.glb"
+      scale="10 10 10"
+      position="0 0 0">
+    </a-entity>
+  </a-marker>
 
-      <a-entity camera></a-entity>
-    </a-scene>
+  <a-entity camera></a-entity>
+</a-scene>
 
-    <!-- Buttons -->
-    <div style="position:absolute; top:10px; left:10px; z-index:999;">
-      <button id="toggleCamera" style="padding:10px; font-size:16px; margin-right:5px;">
-        Switch Camera
-      </button>
-      <button id="takeSelfie" style="padding:10px; font-size:16px;">
-        📸 Take Selfie
-      </button>
-    </div>
 
-    <script>
-      let currentFacing = "environment"; // default rear
-      const scene = document.getElementById("ar-scene");
-
-      // Toggle camera
-      document.getElementById("toggleCamera").addEventListener("click", () => {
-        currentFacing = (currentFacing === "environment") ? "user" : "environment";
-        scene.setAttribute("arjs", `sourceType: webcam; facingMode: ${currentFacing}`);
-      });
-
-      // Take selfie
-      document.getElementById("takeSelfie").addEventListener("click", () => {
-        const canvas = document.querySelector("canvas");
-        if (!canvas) {
-          alert("Camera not ready yet!");
-          return;
-        }
-
-        // Capture screenshot
-        const image = canvas.toDataURL("image/png");
-
-        // Open Padlet in new tab
-        const padletUrl = "https://padlet.com/roxloon777/campus-hunt-wall-of-fame-gkek97r08b9p9047";
-        const win = window.open(padletUrl, "_blank");
-
-        // Also auto-download selfie for proof
-        const link = document.createElement("a");
-        link.download = "selfie.png";
-        link.href = image;
-        link.click();
       });
     </script>
   </body>

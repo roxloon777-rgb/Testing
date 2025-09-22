@@ -1,24 +1,41 @@
-<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <title>AR.js Hiro Test</title>
-    <!-- A-Frame -->
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <!-- AR.js -->
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   </head>
-  <body style="margin: 0; overflow: hidden;">
-    <a-scene embedded arjs="sourceType: webcam;">
-     <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.hiro">
-  <a-entity 
-    gltf-model="models/medical_syringe.glb" 
-    scale="10 10 10" 
-    position="0 0 0">
-  </a-entity>
-</a-marker>
+  <body style="margin:0; overflow:hidden;">
+    <a-scene 
+      id="ar-scene"
+      embedded 
+      arjs="sourceType: webcam; facingMode: environment;">
+      
+      <!-- Hiro marker -->
+      <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.hiro">
+        <a-entity 
+          gltf-model="models/medical_syringe.glb"
+          scale="10 10 10"
+          position="0 0 0">
+        </a-entity>
+      </a-marker>
 
       <a-entity camera></a-entity>
     </a-scene>
+
+    <!-- Camera toggle button -->
+    <button id="toggleCamera" 
+      style="position: absolute; top: 10px; right: 10px; z-index: 999; padding: 10px; font-size: 16px;">
+      Switch Camera
+    </button>
+
+    <script>
+      let currentFacing = "environment"; // default rear
+      const button = document.getElementById("toggleCamera");
+      const scene = document.getElementById("ar-scene");
+
+      button.addEventListener("click", () => {
+        currentFacing = (currentFacing === "environment") ? "user" : "environment";
+        scene.setAttribute("arjs", `sourceType: webcam; facingMode: ${currentFacing}`);
+      });
+    </script>
   </body>
 </html>

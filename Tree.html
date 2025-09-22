@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>AR Selfie Treasure Hunt</title>
+  <title>AR Treasure Hunt</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
   <style>
@@ -28,6 +28,7 @@
       border-radius: 5px;
       font-size: 14px;
       z-index: 999;
+      max-width: 90%;
     }
   </style>
 </head>
@@ -37,7 +38,7 @@
     embedded
     vr-mode-ui="enabled: false"
     id="ar-scene"
-    arjs="sourceType: webcam; facingMode: user;"> <!-- Front camera -->
+    arjs="sourceType: webcam; facingMode: user;"> <!-- front camera -->
 
     <!-- Hiro marker -->
     <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.hiro">
@@ -48,29 +49,15 @@
   </a-scene>
 
   <div id="controls">
-    <button id="toggleCamera">Switch Camera</button>
-    <button id="openPadlet">📸 Upload Selfie to Padlet</button>
+    <button id="openPadlet">Open Padlet Wall</button>
   </div>
 
   <div id="instructions">
-    1️⃣ Use your phone’s **native screenshot** (power + volume button) to capture your AR selfie.<br>
-    2️⃣ Then press “Upload Selfie to Padlet”.
+    1️⃣ Use your phone’s **native screenshot** (power + volume buttons) to capture your AR experience.<br>
+    2️⃣ Then press “Open Padlet Wall” to upload your screenshot.
   </div>
 
   <script>
-    const sceneEl = document.getElementById("ar-scene");
-    let currentFacing = localStorage.getItem("arFacing") || "user";
-
-    // Apply current facing mode at page load
-    sceneEl.setAttribute("arjs", `sourceType: webcam; facingMode: ${currentFacing}`);
-
-    // Switch Camera button (reload page)
-    document.getElementById("toggleCamera").addEventListener("click", () => {
-      currentFacing = (currentFacing === "user") ? "environment" : "user";
-      localStorage.setItem("arFacing", currentFacing);
-      location.reload();
-    });
-
     // Open Padlet button
     document.getElementById("openPadlet").addEventListener("click", () => {
       window.open("https://padlet.com/roxloon777/campus-hunt-wall-of-fame-gkek97r08b9p9047", "_blank");
@@ -78,3 +65,4 @@
   </script>
 </body>
 </html>
+

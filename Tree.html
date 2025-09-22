@@ -18,14 +18,15 @@
       font-size: 16px;
       margin-right: 5px;
     }
-    #preview {
+    #instructions {
       position: absolute;
       bottom: 10px;
       left: 10px;
-      width: 120px;
-      height: 160px;
-      border: 2px solid #fff;
-      object-fit: cover;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      padding: 8px;
+      border-radius: 5px;
+      font-size: 14px;
       z-index: 999;
     }
   </style>
@@ -36,7 +37,7 @@
     embedded
     vr-mode-ui="enabled: false"
     id="ar-scene"
-    arjs="sourceType: webcam; facingMode: user;"> <!-- Front camera default -->
+    arjs="sourceType: webcam; facingMode: user;"> <!-- Front camera -->
 
     <!-- Hiro marker -->
     <a-marker type="pattern" url="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/data/patt.hiro">
@@ -48,48 +49,31 @@
 
   <div id="controls">
     <button id="toggleCamera">Switch Camera</button>
-    <button id="takeSelfie">📸 Take Selfie</button>
+    <button id="openPadlet">📸 Upload Selfie to Padlet</button>
   </div>
 
-  <!-- Preview image -->
-  <img id="preview" src="" alt="Selfie preview">
+  <div id="instructions">
+    1️⃣ Use your phone’s **native screenshot** (power + volume button) to capture your AR selfie.<br>
+    2️⃣ Then press “Upload Selfie to Padlet”.
+  </div>
 
   <script>
     const sceneEl = document.getElementById("ar-scene");
-    const previewEl = document.getElementById("preview");
     let currentFacing = localStorage.getItem("arFacing") || "user";
 
     // Apply current facing mode at page load
     sceneEl.setAttribute("arjs", `sourceType: webcam; facingMode: ${currentFacing}`);
 
-    // Switch Camera button (reload page to reliably switch)
+    // Switch Camera button (reload page)
     document.getElementById("toggleCamera").addEventListener("click", () => {
       currentFacing = (currentFacing === "user") ? "environment" : "user";
       localStorage.setItem("arFacing", currentFacing);
       location.reload();
     });
 
-    // Take selfie button
-    document.getElementById("takeSelfie").addEventListener("click", () => {
-      const canvas = document.querySelector("canvas");
-      if (!canvas) return alert("AR scene not ready yet!");
-
-      // Delay slightly to ensure at least one frame is rendered
-      setTimeout(() => {
-        const image = canvas.toDataURL("image/png");
-
-        // Show preview
-        previewEl.src = image;
-
-        // Download selfie
-        const link = document.createElement("a");
-        link.download = "selfie.png";
-        link.href = image;
-        link.click();
-
-        // Open Padlet
-        window.open("https://padlet.com/roxloon777/campus-hunt-wall-of-fame-gkek97r08b9p9047", "_blank");
-      }, 500);
+    // Open Padlet button
+    document.getElementById("openPadlet").addEventListener("click", () => {
+      window.open("https://padlet.com/roxloon777/campus-hunt-wall-of-fame-gkek97r08b9p9047", "_blank");
     });
   </script>
 </body>
